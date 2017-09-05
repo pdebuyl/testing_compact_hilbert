@@ -1,0 +1,3 @@
+[submodule "libhilbert"]
+	path = libhilbert
+	url = https://github.com/pdebuyl/libhilbert
