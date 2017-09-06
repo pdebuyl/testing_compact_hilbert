@@ -1,10 +1,6 @@
-
 from __future__ import print_function, division
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 import math
-from mpl_toolkits.mplot3d import Axes3D
 import h5py
 import sys
 import os.path
