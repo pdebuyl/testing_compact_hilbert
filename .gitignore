@@ -1,0 +1,11 @@
+*~
+*.a
+*.la
+*.o
+*.so
+*.lo
+*.pyc
+*.h5
+build
+.cache
+hilbert
