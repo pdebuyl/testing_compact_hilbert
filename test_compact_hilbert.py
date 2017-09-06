@@ -311,8 +311,15 @@ if args.compare:
 
 if args.plot:
 
+    plt.rcParams['figure.figsize'] = (12, 6)
+    plt.rcParams['figure.subplot.left'] = 0.
+    plt.rcParams['figure.subplot.bottom'] = 0.07
+    plt.rcParams['figure.subplot.right'] = 0.98
+    plt.rcParams['figure.subplot.top'] = 0.88
+    plt.rcParams['figure.subplot.hspace'] = 0.4
+
     # plot the curve
-    fig = plt.figure(figsize=(13,6))
+    fig = plt.figure()
     plt.suptitle('compact Hilbert curve, M '+' '.join(map(str, args.M))+' traversal in '+str(args.vd))
     if N==2:
         plt.subplot(121)
