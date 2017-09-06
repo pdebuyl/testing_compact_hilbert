@@ -1,24 +1,28 @@
+"""
+Program to compute coordinates along a compact Hilbert index curve. The results
+can be compared to the values obtained by the program "hilbert" and stored in a
+HDF5 file.
+"""
 from __future__ import print_function, division
 import numpy as np
 import math
 import h5py
 import sys
 import os.path
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import argparse
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('M', type=int, nargs='+')
+parser.add_argument('--compare', action='store_true',
+                    help='Compare the result of this code to a stored file'
+                    ' obtained by "hilbert"')
+parser.add_argument('--plot', action='store_true',
+                    help='For 2 or 3 dimensions, plot the curve')
+parser.add_argument('--vd', type=int, default=0,
+                    help='Main traversal direction')
 args = parser.parse_args()
-
-filename = 'hilbert_'+'x'.join(map(str, args.M))+'.h5'
-
-if not os.path.isfile(filename):
-    print('The reference file', filename, 'does not exist')
-    sys.exit(0)
-
-with h5py.File(filename, 'r') as a:
-    file_data = a['value'][:]
-    assert np.all(np.equal(a['value'].attrs['M'], args.M))
 
 N = len(args.M)
 M = max(args.M)
@@ -280,12 +284,68 @@ class CompactHilbert(object):
             vd = (vd + d(w) + 1) % self._N
         return p
 
-tester = CompactHilbert(compact_M=args.M, vd=0)
+compact = CompactHilbert(compact_M=args.M, vd=args.vd)
 
-test_data = [tester.TR_algo8(idx) for idx in range(tester.hmax)]
-    
-assert np.all(np.equal(test_data, file_data))
+test_data = [compact.TR_algo8(idx) for idx in range(compact.hmax)]
 
-hilbert_cube_indices = np.array([TR_algo2(p, vd=0) for p in test_data])
+hilbert_cube_indices = np.array([TR_algo2(p, vd=args.vd) for p in test_data])
 
 assert (hilbert_cube_indices[1:]-hilbert_cube_indices[:-1]).min()>0
+
+if args.compare:
+
+    if args.vd != 0:
+        raise ValueError("When comparing to libhilbert results, vd must be 0")
+
+    filename = 'hilbert_'+'x'.join(map(str, args.M))+'.h5'
+
+    if not os.path.isfile(filename):
+        print('The reference file', filename, 'does not exist')
+        sys.exit(0)
+
+    with h5py.File(filename, 'r') as a:
+        file_data = a['value'][:]
+        assert np.all(np.equal(a['value'].attrs['M'], args.M))
+
+    assert np.all(np.equal(test_data, file_data))
+
+if args.plot:
+
+    # plot the curve
+    fig = plt.figure(figsize=(13,6))
+    plt.suptitle('compact Hilbert curve, M '+' '.join(map(str, args.M))+' traversal in '+str(args.vd))
+    if N==2:
+        plt.subplot(121)
+        x, y = np.array(test_data).T
+        plt.plot(x, y, marker='o')
+        plt.xlabel('x')
+        plt.ylabel('y')
+    elif N==3:
+        ax = fig.add_subplot(121, projection='3d')
+        x, y, z = np.array(test_data).T
+        ax.plot(x, y, z, marker='o')
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('z')
+    else:
+        raise ValueError("Plotting is only supported for 2 and 3 dimensions")
+
+    # plot the individual coordinates
+
+    plt.subplot(N+1, 2, 2)
+    plt.plot(x)
+    plt.ylabel('x')
+    plt.subplot(N+1, 2, 4)
+    plt.plot(y)
+    plt.ylabel('y')
+    steps = np.abs(x[1:]-x[:-1]) + np.abs(y[1:]-y[:-1])
+    if N==3:
+        plt.subplot(N+1, 2, 6)
+        plt.plot(z)
+        plt.ylabel('z')
+        steps += np.abs(z[1:]-z[:-1])
+    plt.subplot(N+1, 2, 6 if N==2 else 8)
+    plt.plot(steps)
+    plt.ylabel('step size')
+
+    plt.show()

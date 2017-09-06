@@ -14,6 +14,6 @@ hilbert_%.h5: hilbert
 test_%: hilbert_%.h5 compare_%
 
 compare_%: hilbert_%.h5
-	$(PYTHON) test_compact_hilbert.py $(subst x, ,$*)
+	$(PYTHON) test_compact_hilbert.py $(subst x, ,$*) --compare
 
 test: compare_5x2 compare_2x3x1 compare_3x1x2x2
