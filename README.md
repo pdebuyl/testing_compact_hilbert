@@ -25,16 +25,16 @@ Usage
 	- [h5py](http://www.h5py.org/)
 	
 2. Setup:
-  1. Build libhilbert
+    1. Build libhilbert
 
-         cd libhilbert
-		 ./configure
-		 make
-		 cd ..
+            cd libhilbert
+            ./configure
+            make
+            cd ..
 
-  2. Know the location to HDF5, if is not known yet.
+    2. Know the location to HDF5, if is not known yet.
 
-2. Run the comparison for
+2. Run the default comparisons.
 
     make HDF5_HOME=/home/hdf5-1.8.18
 
@@ -42,4 +42,3 @@ Usage
 
 This will compare the Python version and the C++ version of the code after build the
 executable `hilbert`.
-
